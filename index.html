@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flappy Bird Game</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: skyblue; }
+    canvas { display: block; margin: auto; background: #70c5ce; }
+  </style>
+</head>
+<body>
+  <canvas id="flappyCanvas" width="320" height="480"></canvas>
+
+  <script>
+    const canvas = document.getElementById('flappyCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let frames = 0;
+    const DEGREE = Math.PI/180;
+
+    const sprite = new Image();
+    sprite.src = 'https://openai-cdn.typesense.net/flappybird-sprite.png'; // use a public sprite
+
+    const state = {
+      current: 0,
+      getReady: 0,
+      game: 1,
+      over: 2
+    };
+
+    canvas.addEventListener("click", function() {
+      switch(state.current){
+        case state.getReady:
+          state.current = state.game;
+          break;
+        case state.game:
+          bird.flap();
+          break;
+        case state.over:
+          location.reload();
+          break;
+      }
+    });
+
+    const bird = {
+      x: 50,
+      y: 150,
+      width: 34,
+      height: 26,
+      gravity: 0.25,
+      jump: 4.6,
+      speed: 0,
+      rotation: 0,
+
+      draw() {
+        ctx.fillStyle = "yellow";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      },
+
+      update() {
+        if(state.current === state.getReady) {
+          this.y = 150;
+          this.speed = 0;
+        } else {
+          this.speed += this.gravity;
+          this.y += this.speed;
+
+          if(this.y + this.height >= canvas.height){
+            state.current = state.over;
+          }
+        }
+      },
+
+      flap() {
+        this.speed = -this.jump;
+      }
+    };
+
+    function draw() {
+      ctx.fillStyle = "#70c5ce";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      bird.draw();
+    }
+
+    function update() {
+      bird.update();
+    }
+
+    function loop() {
+      update();
+      draw();
+      frames++;
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+  </script>
+</body>
+</html>
